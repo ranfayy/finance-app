@@ -69,4 +69,41 @@ const deleteFinance = async (req, res) => {
   }
 };
 
-module.exports = { getFinances, createFinance, updateFinance, deleteFinance };
+const financeReport = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { start_date, end_date, type } = req.query;
+
+    let filter = { user: id };
+
+    if (start_date)
+      filter.createdAt = {
+        ...filter.createdAt,
+        $gte: new Date(start_date.split("-").reverse().join("-")),
+      };
+    if (end_date)
+      filter.createdAt = {
+        ...filter.createdAt,
+        $lte: new Date(end_date.split("-").reverse().join("-")),
+      };
+
+    if (type) filter.type = type;
+
+    const data = await Finance.find(filter).select(
+      "-createdAt -updatedAt -user -__v"
+    );
+    const totalAmount = data.reduce((sum, item) => sum + item.amount, 0);
+
+    res.status(200).json({ totalAmount, data });
+  } catch {
+    res.status(500).json({ message: "Terjadi kesalahan server" });
+  }
+};
+
+module.exports = {
+  getFinances,
+  createFinance,
+  updateFinance,
+  deleteFinance,
+  financeReport,
+};

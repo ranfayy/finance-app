@@ -6,9 +6,12 @@ const {
   createFinance,
   updateFinance,
   deleteFinance,
+  financeReport,
 } = require('../controllers/financeController');
 
 router.get('/', protect, getFinances);
+
+router.get('/:id', protect, financeReport);
 
 router.post('/', protect, createFinance);
 
