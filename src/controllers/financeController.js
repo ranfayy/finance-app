@@ -93,7 +93,18 @@ const deleteFinance = async (req, res) => {
 const filterFinance = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { type, month, year } = req.query;
+    const {
+      type,
+      month,
+      year,
+      keyword,
+      category,
+      minAmount,
+      maxAmount,
+      startDate,
+      endDate,
+    } = req.query;
+
     let query = { user: userId };
 
     if (type) {
@@ -126,6 +137,29 @@ const filterFinance = async (req, res) => {
             );
       query.createdAt.$gte = monthStart;
       query.createdAt.$lt = monthEnd;
+    }
+
+    if (minAmount || maxAmount) {
+      query.amount = {};
+      if (minAmount) query.amount.$gte = Number(minAmount);
+      if (maxAmount) query.amount.$lte = Number(maxAmount);
+    }
+
+    if (keyword) {
+      query.$or = [
+        { title: { $regex: keyword, $options: "i" } },
+        { category: { $regex: keyword, $options: "i" } },
+      ];
+    }
+
+    if (category) {
+      query.category = category;
+    }
+
+   if (startDate || endDate) {
+      query.createdAt = {};
+      if (startDate) query.createdAt.$gte = new Date(startDate);
+      if (endDate) query.createdAt.$lte = new Date(endDate);
     }
 
     const finances = await Finance.find(query).sort({ createdAt: -1 });
