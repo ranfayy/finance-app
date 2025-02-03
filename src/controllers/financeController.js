@@ -261,6 +261,57 @@ const getMonthlyStats = async (req, res) => {
   }
 };
 
+const getFinanceReportByPeriod = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { startDate, endDate } = req.query;
+
+    if (!startDate || !endDate) {
+      return res
+        .status(400)
+        .json({ message: "Tanggal mulai dan akhir harus diisi" });
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return res.status(400).json({ message: "Format tanggal tidak valid" });
+    }
+
+    if (start > end) {
+      return res
+        .status(400)
+        .json({ message: "Tanggal mulai harus sebelum tanggal akhir" });
+    }
+
+    const finances = await Finance.find({
+      user: userId,
+      createdAt: { $gte: start, $lte: end },
+    });
+
+    const totalIncome = finances
+      .filter((item) => item.type === "income")
+      .reduce((acc, curr) => acc + curr.amount, 0);
+
+    const totalExpense = finances
+      .filter((item) => item.type === "expense")
+      .reduce((acc, curr) => acc + curr.amount, 0);
+
+    const balance = totalIncome - totalExpense;
+
+    res.status(200).json({
+      startDate,
+      endDate,
+      totalIncome,
+      totalExpense,
+      balance,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Terjadi kesalahan server" });
+  }
+};
+
 module.exports = {
   getFinances,
   createFinance,
@@ -269,5 +320,6 @@ module.exports = {
   filterFinance,
   getFinanceSummary,
   getCategoryStats,
-  getMonthlyStats
+  getMonthlyStats,
+  getFinanceReportByPeriod,
 };

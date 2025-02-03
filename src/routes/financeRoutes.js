@@ -10,6 +10,7 @@ const {
   getFinanceSummary,
   getCategoryStats,
   getMonthlyStats,
+  getFinanceReportByPeriod,
 } = require("../controllers/financeController");
 
 router.get('/', protect, getFinances);
@@ -21,6 +22,8 @@ router.get("/summary", protect, getFinanceSummary);
 router.get("/category-stats", protect, getCategoryStats);
 
 router.get("/monthly-stats", protect, getMonthlyStats);
+
+router.get("/report", protect, getFinanceReportByPeriod);
 
 router.post('/', protect, createFinance);
 
