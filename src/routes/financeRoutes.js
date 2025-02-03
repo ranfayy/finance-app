@@ -8,8 +8,9 @@ const {
   deleteFinance,
   filterFinance,
   getFinanceSummary,
-  getCategoryStats
-} = require('../controllers/financeController');
+  getCategoryStats,
+  getMonthlyStats,
+} = require("../controllers/financeController");
 
 router.get('/', protect, getFinances);
 
@@ -18,6 +19,8 @@ router.get("/filter", protect, filterFinance);
 router.get("/summary", protect, getFinanceSummary);
 
 router.get("/category-stats", protect, getCategoryStats);
+
+router.get("/monthly-stats", protect, getMonthlyStats);
 
 router.post('/', protect, createFinance);
 
