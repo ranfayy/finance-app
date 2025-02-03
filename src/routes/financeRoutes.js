@@ -7,11 +7,14 @@ const {
   updateFinance,
   deleteFinance,
   filterFinance,
+  getFinanceSummary
 } = require('../controllers/financeController');
 
 router.get('/', protect, getFinances);
 
 router.get("/filter", protect, filterFinance);
+
+router.get("/summary", protect, getFinanceSummary);
 
 router.post('/', protect, createFinance);
 
